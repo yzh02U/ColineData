@@ -1,8 +1,34 @@
 const fetch = require("node-fetch");
 const CryptoJS = require("crypto-js");
-const crypt = require("crypto");
+const crypto = require("crypto");
+
+const URL = "https://c2ccdn.coolkit.cc/oauth/index.html";
+const redirectUrl = "https://example.com/callback";
 
 const nonce = "ABCDEFGH";
+const state = "10011";
+let seq = "";
+
+exports.getCode = async (req, res, next) => {
+  try {
+    const { client_id, client_secret } = req.headers;
+
+    if (!client_id || !client_secret) {
+      return res.status(400).json({ error: "No se entrega ningun codigo" });
+    }
+
+    seq = Date.now().toString();
+    const sign = OAUTH_sign(client_id, client_secret, seq);
+    const dir = `https://c2ccdn.coolkit.cc/oauth/index.html?state=${state}&clientId=${client_id}&authorization=${sign}&seq=${seq}&redirectUrl=${redirectUrl}&nonce=${nonce}&grantType=authorization_code&showQRCode=false`;
+
+    res.json({
+      url: "Ingrese la siguiente url en el navegador y autentiquese: " + dir,
+    });
+  } catch (error) {
+    console.error("Error obteniendo token:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 exports.getToken = async (req, res, next) => {
   try {
@@ -57,6 +83,17 @@ async function encryptStr(signStr, secretKey) {
     CryptoJS.HmacSHA256(signStr, secretKey)
   );
   return hash;
+}
+
+function OAUTH_sign(clientId, clientSecret, seq) {
+  const buffer = Buffer.from(`${clientId}_${seq}`, "utf-8");
+  const sign = crypto
+    .createHmac("sha256", clientSecret)
+    .update(buffer)
+    .digest("base64");
+  console.log(sign);
+
+  return sign;
 }
 
 module.exports;
