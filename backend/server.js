@@ -3,6 +3,7 @@ const app = express();
 const port = 5000;
 
 const tuyaRouter = require("./Routes/Tuya_route.js");
+const ewelinkRouter = require("./Routes/Ewelink_route.js");
 
 // Middleware de logging
 const loggerMiddleware = (req, res, next) => {
@@ -21,6 +22,7 @@ app.get("/api/mensaje", (req, res) => {
 
 //Tuya Api
 app.use("/api/tuya/", tuyaRouter);
+app.use("/api/ewelink/", ewelinkRouter);
 
 // Iniciar el servidor
 app.listen(port, () => {

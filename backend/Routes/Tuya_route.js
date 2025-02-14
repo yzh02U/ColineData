@@ -1,8 +1,14 @@
 const express = require("express");
 
-const { getToken } = require("../Controllers/TuyaController.js");
+const {
+  getToken,
+  refreshToken,
+  getDeviceInfo,
+} = require("../Controllers/TuyaController.js");
 const router = express.Router();
 
-router.post("/getToken", getToken);
+router.get("/getToken", getToken);
+router.get("/refreshToken", refreshToken);
+router.get("/getDeviceInfo", getDeviceInfo);
 
 module.exports = router;
