@@ -1,8 +1,13 @@
 const express = require("express");
 
-const { getToken, login } = require("../Controllers/EwelinkController.js");
+const {
+  getToken,
+  getCode,
+  updateStatusofDevice,
+} = require("../Controllers/EwelinkController.js");
 const router = express.Router();
 
-router.post("/getToken", getToken);
-router.get("/getCode", login);
+router.get("/getToken", getToken);
+router.get("/getCode", getCode);
+router.post("/updateStatusofDevice", updateStatusofDevice);
 module.exports = router;

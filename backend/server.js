@@ -4,6 +4,7 @@ const port = 5000;
 
 const tuyaRouter = require("./Routes/Tuya_route.js");
 const ewelinkRouter = require("./Routes/Ewelink_route.js");
+const formulasRouter = require("./Routes/Formulas_route.js");
 
 // Middleware de logging
 const loggerMiddleware = (req, res, next) => {
@@ -12,8 +13,7 @@ const loggerMiddleware = (req, res, next) => {
 };
 
 app.use(express.json()); // Middleware para parsear JSON
-// Usar middleware antes de las rutas
-app.use(loggerMiddleware);
+app.use(loggerMiddleware); // Usar middleware antes de las rutas
 
 // Ruta de ejemplo para el backend
 app.get("/api/mensaje", (req, res) => {
@@ -23,6 +23,7 @@ app.get("/api/mensaje", (req, res) => {
 //Tuya Api
 app.use("/api/tuya/", tuyaRouter);
 app.use("/api/ewelink/", ewelinkRouter);
+app.use("/api/formula/", formulasRouter);
 
 // Iniciar el servidor
 app.listen(port, () => {
