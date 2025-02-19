@@ -16,7 +16,7 @@ Se adjuntan los enlaces a las APIS utilizadas:
 
 # Instalación
 
-Clone el repositorio en su dispositivo. Observará que el proyecto "ColineData" contiene de forma separada las carpetas "backend" y "frontend". El backend será encargado de procesar las peticiones REST mientras que el frontend enviará las peticiones al backend. Debe abrir dos terminales para ejecutar las carpetas de forma separada:
+Clone el repositorio en su dispositivo. Observará que el proyecto "ColineData" contiene de forma separada las carpetas "backend" y "frontend". El backend será encargado de procesar las peticiones REST mientras que el frontend enviará las peticiones al backend. Debe abrir dos terminales para ejecutar las carpetas:
 
 ## Backend
 
