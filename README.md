@@ -12,6 +12,7 @@ Se adjuntan los enlaces a las APIS utilizadas:
 
 - Ewelink: https://dev.ewelink.cc/#/
 - Tuya: https://developer.tuya.com/en/docs/iot
+- Eskuad: https://eskuad.notion.site/Documentaci-n-API-P-blica-1ec8a1a6f9924c8099d1af79b4f8bf66
 
 # Instalación
 
