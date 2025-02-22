@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
-import { verifyAccount } from "../BD/Connection.js";
+/*const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
+//import { verifyAccount } from "../BD/Connection.js";
 
 const generateToken = (usuario) => {
   return jwt.sign(
@@ -18,7 +18,7 @@ const verifyToken = (token) => {
     return null; // Token inválido o expirado
   }
 };
-/*
+
 export const login = async (req, res, next) => {
   try {
     const { user, password, token } = req.body;

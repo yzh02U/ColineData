@@ -24,7 +24,7 @@ exports.getCode = async (req, res, next) => {
       url: "Ingrese la siguiente url en el navegador y autentiquese: " + dir,
     });
   } catch (error) {
-    console.error("Error obteniendo token:", error);
+    console.error("Error obteniendo código:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 };
