@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
-
+//En construccion
+/*
 exports.getTimeOnSwitch = async (req, res, next) => {
   const { Altura, Ancho, Largo, Velocidad, Area, Percentage } = req.headers;
 
@@ -28,3 +29,4 @@ exports.getTimeOnSwitch = async (req, res, next) => {
     res.status(400).json({ error: "Uno de de los parametros es invalido" });
   }
 };
+*/
