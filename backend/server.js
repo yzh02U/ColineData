@@ -23,8 +23,6 @@ app.get("/api/mensaje", (req, res) => {
   res.json({ mensaje: "Hola desde el backend!" });
 });
 
-//Conexion a Base de datos
-BD.Connect();
 //Apis utilizadas
 app.use("/api/tuya/", tuyaRouter);
 app.use("/api/ewelink/", ewelinkRouter);

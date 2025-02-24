@@ -1,26 +1,27 @@
-import jwt from "jsonwebtoken";
-const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
-import {
+const jwt = require("jsonwebtoken");
+const {
   verifyAccount,
   getRole,
   userExists,
   saveUser,
   deleteUserDB,
-} from "../BD/BD_Operations.js";
-import { decode } from "punycode";
+} = require("../BD/BD_Operations");
+const { decode } = require("punycode");
+
+const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
 
 const generateToken = (usuario) => {
   return jwt.sign(
     { user: usuario }, // Payload (datos a guardar en el token)
     JWT_SECRET,
-    { expiresIn: "1h" } //Duracion del Token
+    { expiresIn: "1h" } // Duración del Token
   );
 };
 
 const verifyToken = (token, user) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    if (decode.user != user) {
+    if (decoded.user != user) {
       return false;
     }
     return decoded; // Retorna los datos decodificados
@@ -29,7 +30,7 @@ const verifyToken = (token, user) => {
   }
 };
 
-export const login = async (req, res, next) => {
+exports.login = async (req, res, next) => {
   try {
     const { user, password, token } = req.body;
 
@@ -75,7 +76,7 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const createUser = async (req, res, next) => {
+exports.createUser = async (req, res, next) => {
   try {
     const { token, user } = req.headers;
     const { user_created, password_created, role_assigned } = req.body;
@@ -110,7 +111,11 @@ export const createUser = async (req, res, next) => {
       return;
     }
 
-    const result = saveUser(user_created, password_created, role_assigned);
+    const result = await saveUser(
+      user_created,
+      password_created,
+      role_assigned
+    );
 
     let body = "";
     if (result) {
@@ -118,7 +123,6 @@ export const createUser = async (req, res, next) => {
         response: "usuario creado de forma exitosa",
       };
     } else {
-      // Generamos el cuerpo de la respuesta
       body = {
         err: "error al crear el esuario",
       };
@@ -130,7 +134,7 @@ export const createUser = async (req, res, next) => {
   }
 };
 
-export const deleteUser = async (req, res, next) => {
+exports.deleteUser = async (req, res, next) => {
   try {
     const { token, user } = req.headers;
     const { user_deleted } = req.body;
@@ -160,7 +164,6 @@ export const deleteUser = async (req, res, next) => {
         response: "usuario eliminado de forma exitosa",
       };
     } else {
-      // Generamos el cuerpo de la respuesta
       body = {
         err: "no se ha encontrado el usuario",
       };
@@ -171,3 +174,5 @@ export const deleteUser = async (req, res, next) => {
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };
+
+module.exports;
