@@ -65,9 +65,6 @@ INSERT INTO users (usuario, contraseña, rol) VALUES
 
 - Vaya a la carpeta backend con "cd backend".
 - Instale las dependencias necesarias con "npm install".
-- Instale node-fetch con "npm install node-fetch".
-- Instale JWT con "npm install jsonwebtoken".
-- Instale la biblioteca de Mysql para Nodejs con "npm install mysql2"
 - En la ruta "ColineData/backend/BD/Connection.js" modifique los parámetros de conexión a su base de datos:
 
  ```
