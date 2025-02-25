@@ -6,21 +6,24 @@ const {
   saveUser,
   deleteUserDB,
 } = require("../BD/BD_Operations");
-const { decode } = require("punycode");
+
+const cookieParser = require("cookie-parser");
 
 const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
+const JWT_SECRET_REFRESH =
+  "z1S+o2Hj2uB9sakjhdjakfgbjbv=sijq`qwbnduqbnW9o5L8dDfYkX3V4tNp6yG_REFRESH_KEY";
 
-const generateToken = (usuario) => {
+const generateToken = (usuario, key, duration) => {
   return jwt.sign(
     { user: usuario }, // Payload (datos a guardar en el token)
-    JWT_SECRET,
-    { expiresIn: "1h" } // Duración del Token
+    key,
+    { expiresIn: `${duration}m` } // Duración del Token
   );
 };
 
-const verifyToken = (token, user) => {
+const verifyToken = (token, secret, user) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
     if (decoded.user != user) {
       return false;
     }
@@ -47,7 +50,7 @@ exports.login = async (req, res, next) => {
     }
 
     if (token) {
-      if (!verifyToken(token, user)) {
+      if (!verifyToken(token, JWT_SECRET, user)) {
         res.status(400).json({ error: "Token inválido" });
         return;
       }
@@ -64,9 +67,16 @@ exports.login = async (req, res, next) => {
       // Generamos el cuerpo de la respuesta
       body = {
         access: true,
-        token: generateToken(user), // Generar nuevo token si no hay
+        token: generateToken(user, JWT_SECRET, 45), // Generar nuevo token si no hay
         rol: await getRole(user),
       };
+
+      res.cookie("RT", generateToken(user, JWT_SECRET_REFRESH, 90), {
+        httpOnly: true,
+        maxAge: 540000,
+        secure: true,
+        sameSite: "Strict",
+      });
     }
 
     return res.json(body);
@@ -93,7 +103,7 @@ exports.createUser = async (req, res, next) => {
         .json({ error: "No se entrega uno o más de los parámetros" });
     }
 
-    if (!verifyToken(token, user)) {
+    if (!verifyToken(token, JWT_SECRET, user)) {
       res.status(400).json({ error: "Token inválido" });
       return;
     }
@@ -145,7 +155,7 @@ exports.deleteUser = async (req, res, next) => {
         .json({ error: "No se entrega uno o más de los parámetros" });
     }
 
-    if (!verifyToken(token, user)) {
+    if (!verifyToken(token, JWT_SECRET, user)) {
       res.status(400).json({ error: "Token inválido" });
       return;
     }
@@ -171,6 +181,40 @@ exports.deleteUser = async (req, res, next) => {
 
     return res.json(body);
   } catch (error) {
+    return res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+exports.refreshToken = async (req, res, next) => {
+  try {
+    const { user } = req.query;
+    const RT = req.cookies.RT;
+
+    if (!user || !RT) {
+      return res
+        .status(400)
+        .json({ error: "No se entrega uno o más de los parámetros" });
+    }
+
+    if (!verifyToken(RT, JWT_SECRET_REFRESH, user)) {
+      res.status(400).json({ error: "Token inválido" });
+      return;
+    }
+
+    const body = {
+      new_token: generateToken(user, JWT_SECRET, 45),
+    };
+
+    res.cookie("RT", generateToken(user, JWT_SECRET_REFRESH, 90), {
+      httpOnly: true,
+      maxAge: 540000,
+      secure: true,
+      sameSite: "Strict",
+    });
+
+    return res.json(body);
+  } catch (error) {
+    console.error("Error obteniendo token:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
   }
 };

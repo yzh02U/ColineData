@@ -2,7 +2,6 @@ const mysql = require("mysql2");
 const crypto = require("crypto");
 const { connection } = require("./Connection");
 
-// Función para verificar cuenta (usando async/await)
 async function verifyAccount(user = null, client_secret = null) {
   if (!user || !client_secret) {
     console.log("Error: No se especifica uno de los parámetros");
@@ -13,7 +12,7 @@ async function verifyAccount(user = null, client_secret = null) {
   const query = "SELECT * FROM users";
 
   try {
-    const [results] = await connection.query(query); // Usar promesas
+    const [results] = await connection.query(query); 
 
     for (const usuario of results) {
       console.log(
@@ -41,7 +40,7 @@ async function getRole(user = null) {
   let rol = "";
 
   try {
-    const [results] = await connection.query(query); // Usar promesas
+    const [results] = await connection.query(query);
     rol = results[0].rol;
   } catch (err) {
     console.error("Error al obtener los usuarios:", err);
@@ -61,7 +60,7 @@ async function userExists(user = null) {
   const query = `SELECT * FROM users WHERE usuario = "${user}"`;
 
   try {
-    const [results] = await connection.query(query); // Usar promesas
+    const [results] = await connection.query(query); 
     return results.length > 0;
   } catch (err) {
     console.error("Error al verificar la existencia del usuario:", err);

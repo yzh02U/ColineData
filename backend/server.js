@@ -1,4 +1,5 @@
 const BD = require("./BD/Connection.js");
+const cookieParser = require("cookie-parser");
 
 const express = require("express");
 const app = express();
@@ -17,6 +18,8 @@ const loggerMiddleware = (req, res, next) => {
 
 app.use(express.json()); // Middleware para parsear JSON
 app.use(loggerMiddleware); // Usar middleware antes de las rutas
+
+app.use(cookieParser());
 
 // Ruta de ejemplo para el backend
 app.get("/api/mensaje", (req, res) => {
