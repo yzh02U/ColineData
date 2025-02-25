@@ -199,7 +199,7 @@
 			"response": []
 		},
 		{
-			"name": "GetEwelinkUpdateStatusOfDevice",
+			"name": "UpdateEwelinkStatusOfDevice",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -238,46 +238,21 @@
 			"response": []
 		},
 		{
-			"name": "GetFormulasTimeOnSwitch",
+			"name": "Login",
 			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Altura",
-						"value": "",
-						"type": "text"
-					},
-					{
-						"key": "Ancho",
-						"value": "",
-						"type": "text"
-					},
-					{
-						"key": "Largo",
-						"value": "",
-						"type": "text"
-					},
-					{
-						"key": "Velocidad",
-						"value": "",
-						"type": "text"
-					},
-					{
-						"key": "Area",
-						"value": "",
-						"type": "text"
-					},
-					{
-						"key": "Percentage",
-						"value": "",
-						"type": "text"
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user\": \"\",\r\n    \"password\" : \"\",\r\n    \"token\" : \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
 					}
-				],
+				},
 				"url": {
-					"raw": "http://localhost:5000/api/formula/getTimeOnSwitch",
+					"raw": "http://localhost:5000/api/login/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -285,8 +260,96 @@
 					"port": "5000",
 					"path": [
 						"api",
-						"formula",
-						"getTimeOnSwitch"
+						"login",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateUser",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "token",
+						"value": "{{Access_Token}}",
+						"type": "text"
+					},
+					{
+						"key": "user",
+						"value": "{{user}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_created\": \"\",\r\n    \"password_created\": \"\",\r\n    \"role_assigned\": \"\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/login/CreateUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"login",
+						"CreateUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteUser",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "user",
+						"value": "{{user}}",
+						"type": "text"
+					},
+					{
+						"key": "token",
+						"value": "{{Access_Token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"user_deleted\": \"\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/login/DeleteUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"login",
+						"DeleteUser"
 					]
 				}
 			},
