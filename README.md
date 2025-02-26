@@ -68,13 +68,22 @@ INSERT INTO users (usuario, contraseña, rol) VALUES
 - En la ruta "ColineData/backend/BD/Connection.js" modifique los parámetros de conexión a su base de datos:
 
  ```
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
   host: "localhost", // Servidor de MySQL
   user: "root", // Usuario de MySQL
   password: "3812", // Contraseña (ajústelo)
   database: "colinedata", // Base de datos
 });
 ```
+-En la ruta "ColineData/backend/Contollers/TuyaController.js" debe modificar las siguientes variables de acceso a la plataforma Tuya:
+
+ ```
+const TuyaClient_ID = "" ;
+const TuyaClient_Secret = "";
+const TuyaUID = "";
+const model = "";
+ ```
+
 - Ejecute el servidor backend con "npm start".
 
 ## Frontend
