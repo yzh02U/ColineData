@@ -12,7 +12,7 @@ async function verifyAccount(user = null, client_secret = null) {
   const query = "SELECT * FROM users";
 
   try {
-    const [results] = await connection.query(query); 
+    const [results] = await connection.query(query);
 
     for (const usuario of results) {
       console.log(
@@ -30,7 +30,7 @@ async function verifyAccount(user = null, client_secret = null) {
   return verified;
 }
 
-async function getRole(user = null) {
+async function getRole(user) {
   if (!user) {
     console.log("Error: No se especifica uno de los parámetros");
     return "";
@@ -60,7 +60,7 @@ async function userExists(user = null) {
   const query = `SELECT * FROM users WHERE usuario = "${user}"`;
 
   try {
-    const [results] = await connection.query(query); 
+    const [results] = await connection.query(query);
     return results.length > 0;
   } catch (err) {
     console.error("Error al verificar la existencia del usuario:", err);

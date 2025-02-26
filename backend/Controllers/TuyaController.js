@@ -1,170 +1,186 @@
-const fetch = require("node-fetch");
 const CryptoJS = require("crypto-js");
 const crypt = require("crypto");
+const internal = require("stream");
 
-exports.getToken = async (req, res, next) => {
-  try {
-    const { client_id, client_secret } = req.headers;
+const {
+  verifyAccount,
+  getRole,
+  userExists,
+  saveUser,
+  deleteUserDB,
+} = require("../BD/BD_Operations");
 
-    if (!client_id || !client_secret) {
-      return res
-        .status(400)
-        .json({ error: "Faltan client_id o client_secret" });
-    }
+const TuyaClient_ID = "4fgcma3wh97nra5phuds";
+const TuyaClient_Secret = "9f21155d2eb14e6fa4af985aea473455";
+const TuyaUID = "az1738331734310nQ0jN";
+const model = "ME201W";
+let TuyaToken = "";
+let TuyaEasy_Refresh_Token = "";
+let devices_info = [];
 
-    const urlPath = "/v1.0/token";
-    const url = `https://openapi.tuyaus.com${urlPath}?grant_type=1`;
+//Ejecucion de en todo instante Para obtener informacion de tuya
 
-    const timestamp = Date.now().toString();
-    const contentHash =
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-    const stringToSign =
-      "GET" +
-      "\n" +
-      contentHash +
-      "\n" +
-      "" +
-      "\n" +
-      "/v1.0/token?grant_type=1";
-    const signStr = client_id + timestamp + stringToSign;
+exports.initialize_Tuya = async () => {
+  console.log("Este es el token de Tuya:");
+  await exports.Obtain_Token();
 
-    const headers = {
-      client_id: client_id,
-      sign: await encryptStr(signStr, client_secret),
-      t: timestamp,
-      sign_method: "HMAC-SHA256",
-    };
+  setInterval(() => {
+    Refreshing_Token();
+    console.log("Actualizando Acceso a la API Tuya");
+  }, 7200 * 1000); // Se ejecuta cada 2 horas
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data });
-    }
-
-    console.log("Recibiendo token de TUYA para el clientID: ", client_id);
-
-    res.json({
-      token: data.result.access_token,
-      easy_refresh_token: data.result.refresh_token,
-    });
-  } catch (error) {
-    console.error("Error obteniendo token:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
+  setInterval(() => {
+    UpdateDeviceInfo();
+    console.log("Obteniendo datos de sensores de la API");
+  }, 5 * 1000); // Se ejecuta cada 5 segundos
 };
 
-exports.refreshToken = async (req, res, next) => {
-  try {
-    const { client_id, client_secret, easy_refresh_token } = req.headers;
+exports.Obtain_Token = async () => {
+  const urlPath = "/v1.0/token";
+  const url = `https://openapi.tuyaus.com${urlPath}?grant_type=1`;
 
-    if (!easy_refresh_token || !client_id || !client_id) {
-      return res
-        .status(400)
-        .json({ error: "Cuerpo no contiene uno de los datos" });
-    }
+  const timestamp = Date.now().toString();
+  const contentHash =
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+  const stringToSign =
+    "GET" + "\n" + contentHash + "\n" + "" + "\n" + "/v1.0/token?grant_type=1";
+  const signStr = TuyaClient_ID + timestamp + stringToSign;
 
-    const urlPath = "/v1.0/token/";
-    const url = `https://openapi.tuyaus.com${urlPath + easy_refresh_token}`;
+  const headers = {
+    client_id: TuyaClient_ID,
+    sign: encryptStr(signStr, TuyaClient_Secret),
+    t: timestamp,
+    sign_method: "HMAC-SHA256",
+  };
 
-    const timestamp = Date.now().toString();
-    const contentHash =
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-    const stringToSign =
-      "GET" +
-      "\n" +
-      contentHash +
-      "\n" +
-      "" +
-      "\n" +
-      "/v1.0/token/" +
-      easy_refresh_token;
-    const signStr = client_id + timestamp + stringToSign;
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+  });
 
-    const headers = {
-      client_id: client_id,
-      sign: await encryptStr(signStr, client_secret),
-      t: timestamp,
-      sign_method: "HMAC-SHA256",
-    };
+  const data = await response.json();
+  TuyaToken = data.result.access_token;
+  TuyaEasy_Refresh_Token = data.result.refresh_token;
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data });
-    }
-
-    console.log("Refrescando token de TUYA para el clientID: ", client_id);
-
-    res.json({ token: data });
-  } catch (error) {
-    console.error("Error refrescando token:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
+  await Refreshing_Token();
 };
 
-//Dependiendo el dispositivo, del sensor que poseemos podemos obtener su informacion
+const Refreshing_Token = async () => {
+  const urlPath = "/v1.0/token/";
+  const url = `https://openapi.tuyaus.com${urlPath + TuyaEasy_Refresh_Token}`;
+
+  const timestamp = Date.now().toString();
+  const contentHash =
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+  const stringToSign =
+    "GET" +
+    "\n" +
+    contentHash +
+    "\n" +
+    "" +
+    "\n" +
+    "/v1.0/token/" +
+    TuyaEasy_Refresh_Token;
+  const signStr = TuyaClient_ID + timestamp + stringToSign;
+
+  const headers = {
+    client_id: TuyaClient_ID,
+    sign: encryptStr(signStr, TuyaClient_Secret),
+    t: timestamp,
+    sign_method: "HMAC-SHA256",
+  };
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+  });
+
+  const data = await response.json();
+  console.log("Se ha refrescado correctamente al acceso de Tuya");
+  TuyaToken = data.result.access_token;
+  TuyaEasy_Refresh_Token = data.result.refresh_token;
+};
+
+const UpdateDeviceInfo = async () => {
+  const urlPath = `/v1.0/users/${TuyaUID}/devices`;
+  const url = `https://openapi.tuyaus.com${urlPath}`;
+
+  const timestamp = Date.now().toString();
+  const contentHash =
+    "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+  const stringToSign = "GET" + "\n" + contentHash + "\n" + "" + "\n" + urlPath;
+  const signStr = TuyaClient_ID + TuyaToken + timestamp + stringToSign;
+
+  const headers = {
+    client_id: TuyaClient_ID,
+    access_token: TuyaToken,
+    sign: encryptStr(signStr, TuyaClient_Secret),
+    t: timestamp,
+    sign_method: "HMAC-SHA256",
+  };
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers,
+  });
+
+  const data = await response.json();
+
+  //console.log(data.result);
+
+  devices_info.length = 0;
+  data.result.forEach((element) => {
+    if (element.model == model) {
+      devices_info.push({
+        tuyaID: element.id,
+        online: element.online,
+        result: element.status,
+      });
+      //console.log(element);
+    }
+  });
+};
+
+//Se obtiene datos del sensor. Obligatorio que sea el modelo de la variable model.
 exports.getDeviceInfo = async (req, res, next) => {
   try {
-    const { client_id, client_secret, token, device_id } = req.headers;
+    const { user, token } = req.headers;
 
-    if (!token || !client_id || !client_secret || !device_id) {
+    if (!token || !user) {
       return res
         .status(400)
         .json({ error: "Cuerpo no contiene uno de los datos" });
     }
 
-    const urlPath = "/v1.0/devices/";
-    const url = `https://openapi.tuyaus.com${urlPath + device_id}`;
+    const role = await getRole(user);
+    console.log("Dice lo siguiente: " + role);
 
-    const timestamp = Date.now().toString();
-    const contentHash =
-      "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-    const stringToSign =
-      "GET" +
-      "\n" +
-      contentHash +
-      "\n" +
-      "" +
-      "\n" +
-      "/v1.0/devices/" +
-      device_id;
-    const signStr = client_id + token + timestamp + stringToSign;
-
-    const headers = {
-      client_id: client_id,
-      access_token: token,
-      sign: await encryptStr(signStr, client_secret),
-      t: timestamp,
-      sign_method: "HMAC-SHA256",
-    };
-
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data });
+    if (role != "") {
+      if (!role == "admin" && !role == "metalurgico") {
+        return res.status(401).json({ error: "Acceso no autorizado" });
+      }
+    } else {
+      return res.status(401).json({ error: "Acceso no autorizado" });
     }
 
-    console.log(
-      "Obteniendo informacion del dispositivo asociado a : ",
-      client_id
-    );
+    let body = [];
 
-    res.json({ token: data });
+    devices_info.forEach((element) => {
+      console.log(element);
+      body.push({
+        tuyaID: element.tuyaID,
+        online: element.online,
+        liquid_depth: element.result[1].value,
+        battery_percentage: element.result[2].value,
+        max_set: element.result[3].value,
+        mini_set: element.result[4].value,
+        installation_height: element.result[5].value,
+        liquid_depth_max: element.result[6].value,
+        liquid_level_percent: element.result[7].value,
+      });
+    });
+
+    res.json({ result: body });
   } catch (error) {
     console.error("No se pudo obtener informacion del dispositivo: ", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -172,7 +188,7 @@ exports.getDeviceInfo = async (req, res, next) => {
 };
 
 //firma del certificado
-async function encryptStr(signStr, secretKey) {
+function encryptStr(signStr, secretKey) {
   var hash = CryptoJS.HmacSHA256(signStr, secretKey);
   var hashInBase64 = hash.toString().toUpperCase();
   return hashInBase64;

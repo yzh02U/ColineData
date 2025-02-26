@@ -8,6 +8,6 @@ const connection = mysql.createPool({
   database: "colinedata",
 });
 
-console.log("Pool de conexiones MySQL creado correctamente.");
+console.log("conexion de MySQL creado correctamente.");
 
 module.exports = { connection };
