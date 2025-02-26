@@ -10,9 +10,9 @@ const {
   deleteUserDB,
 } = require("../BD/BD_Operations");
 
-const TuyaClient_ID = "4fgcma3wh97nra5phuds";
-const TuyaClient_Secret = "9f21155d2eb14e6fa4af985aea473455";
-const TuyaUID = "az1738331734310nQ0jN";
+const TuyaClient_ID = "";
+const TuyaClient_Secret = "";
+const TuyaUID = "";
 const model = "ME201W";
 let TuyaToken = "";
 let TuyaEasy_Refresh_Token = "";
