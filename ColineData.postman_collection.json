@@ -9,81 +9,6 @@
 	},
 	"item": [
 		{
-			"name": "GetTuyaToken",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "client_id",
-						"value": "{{TuyaClient_ID}}",
-						"type": "text"
-					},
-					{
-						"key": "client_secret",
-						"value": "{{TuyaClient_Secret}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:5000/api/tuya/getToken",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"tuya",
-						"getToken"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "GetTuyaRefreshToken",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "client_id",
-						"value": "{{TuyaClient_ID}}",
-						"type": "text"
-					},
-					{
-						"key": "client_secret",
-						"value": "{{TuyaClient_Secret}}",
-						"type": "text"
-					},
-					{
-						"key": "easy_refresh_token",
-						"value": "{{TuyaEasy_Refresh_Token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:5000/api/tuya/refreshToken",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5000",
-					"path": [
-						"api",
-						"tuya",
-						"refreshToken"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "GetTuyaGetDeviceInfo",
 			"request": {
 				"auth": {
@@ -92,23 +17,13 @@
 				"method": "GET",
 				"header": [
 					{
-						"key": "client_id",
-						"value": "{{TuyaClient_ID}}",
-						"type": "text"
-					},
-					{
-						"key": "client_secret",
-						"value": "{{TuyaClient_Secret}}",
+						"key": "user",
+						"value": "{{user}}",
 						"type": "text"
 					},
 					{
 						"key": "token",
-						"value": "{{TuyaToken}}",
-						"type": "text"
-					},
-					{
-						"key": "device_id",
-						"value": "{{TuyaDevice_id}}",
+						"value": "{{Access_Token}}",
 						"type": "text"
 					}
 				],
@@ -244,7 +159,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"user\": \"\",\r\n    \"password\" : \"\",\r\n    \"token\" : \"\"\r\n}",
+					"raw": "{\r\n    \"user\": \"\",\r\n    \"password\" : \"\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -350,6 +265,48 @@
 						"api",
 						"login",
 						"DeleteUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RefreshToken",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/api/login/refreshToken?user={{user}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"login",
+						"refreshToken"
+					],
+					"query": [
+						{
+							"key": "user",
+							"value": "{{user}}"
+						}
 					]
 				}
 			},
