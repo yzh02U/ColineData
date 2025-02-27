@@ -18,11 +18,9 @@ Se adjuntan los enlaces a las APIS utilizadas:
 
 - Debe instalar [MySQL Server y MySQL Wokbench](https://dev.mysql.com/downloads/mysql/) 8.0.41 para almacenar datos de sensores de corriente y creación de usuario.
 
-![image](https://github.com/user-attachments/assets/892dd910-9ea4-4c2b-953e-b6a4d21e231a)
 
 - Genere una nueva conexión con la base de datos en MySQL Workbench en local host. 
 
-![image](https://github.com/user-attachments/assets/c66bc6a4-e884-499a-a7dd-58fc421cd9b3)
  
 Debe crear un nuevo Schema y una tabla llamada "users" con la siguiente query:
 
