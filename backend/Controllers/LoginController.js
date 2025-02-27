@@ -7,11 +7,7 @@ const {
   deleteUserDB,
 } = require("../BD/BD_Operations");
 
-const cookieParser = require("cookie-parser");
-
-const JWT_SECRET = "z1S+o2Hj2uB9W9o5L8dDfYkX3V4tNp6yG";
-const JWT_SECRET_REFRESH =
-  "z1S+o2Hj2uB9sakjhdjakfgbjbv=sijq`qwbnduqbnW9o5L8dDfYkX3V4tNp6yG_REFRESH_KEY";
+const { JWT_SECRET, JWT_SECRET_REFRESH } = require("./Credentials");
 
 const generateToken = (usuario, key, duration) => {
   return jwt.sign(
@@ -21,7 +17,7 @@ const generateToken = (usuario, key, duration) => {
   );
 };
 
-const verifyToken = (token, secret, user) => {
+exports.verifyToken = (token, secret, user) => {
   try {
     const decoded = jwt.verify(token, secret);
     if (decoded.user != user) {
@@ -160,6 +156,7 @@ exports.deleteUser = async (req, res, next) => {
       body = {
         err: "no se ha encontrado el usuario",
       };
+      return res.status(404).json(body);
     }
 
     return res.json(body);

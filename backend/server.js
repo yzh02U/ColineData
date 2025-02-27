@@ -1,6 +1,7 @@
 const BD = require("./BD/Connection.js");
 const cookieParser = require("cookie-parser");
 const { initialize_Tuya } = require("./Controllers/TuyaController.js");
+const { initialize_Ewelink } = require("./Controllers/EwelinkController.js");
 
 const express = require("express");
 const app = express();
@@ -17,6 +18,7 @@ const loggerMiddleware = (req, res, next) => {
   next(); // Llama a la siguiente función en la cadena de middleware
 };
 initialize_Tuya();
+initialize_Ewelink();
 app.use(express.json()); // Middleware para parsear JSON
 app.use(loggerMiddleware); // Usar middleware antes de las rutas
 

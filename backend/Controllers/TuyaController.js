@@ -2,6 +2,8 @@ const CryptoJS = require("crypto-js");
 const crypt = require("crypto");
 const internal = require("stream");
 
+const { verifyToken } = require("./LoginController");
+
 const {
   verifyAccount,
   getRole,
@@ -10,10 +12,14 @@ const {
   deleteUserDB,
 } = require("../BD/BD_Operations");
 
-const TuyaClient_ID = "";
-const TuyaClient_Secret = "";
-const TuyaUID = "";
-const model = "ME201W";
+const {
+  TuyaClient_ID,
+  TuyaClient_Secret,
+  TuyaUID,
+  model,
+  JWT_SECRET,
+} = require("./Credentials");
+
 let TuyaToken = "";
 let TuyaEasy_Refresh_Token = "";
 let devices_info = [];
@@ -21,8 +27,7 @@ let devices_info = [];
 //Ejecucion de en todo instante Para obtener informacion de tuya
 
 exports.initialize_Tuya = async () => {
-  console.log("Este es el token de Tuya:");
-  await exports.Obtain_Token();
+  await getToken();
 
   setInterval(() => {
     Refreshing_Token();
@@ -31,11 +36,11 @@ exports.initialize_Tuya = async () => {
 
   setInterval(() => {
     UpdateDeviceInfo();
-    console.log("Obteniendo datos de sensores de la API");
+    console.log("Obteniendo datos de sensores de la API Tuya");
   }, 5 * 1000); // Se ejecuta cada 5 segundos
 };
 
-exports.Obtain_Token = async () => {
+const getToken = async () => {
   const urlPath = "/v1.0/token";
   const url = `https://openapi.tuyaus.com${urlPath}?grant_type=1`;
 
@@ -119,26 +124,30 @@ const UpdateDeviceInfo = async () => {
     sign_method: "HMAC-SHA256",
   };
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
+  if (TuyaToken != "" && TuyaEasy_Refresh_Token != "") {
+    const response = await fetch(url, {
+      method: "GET",
+      headers,
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  //console.log(data.result);
+    //console.log(data.result);
 
-  devices_info.length = 0;
-  data.result.forEach((element) => {
-    if (element.model == model) {
-      devices_info.push({
-        tuyaID: element.id,
-        online: element.online,
-        result: element.status,
-      });
-      //console.log(element);
-    }
-  });
+    devices_info.length = 0;
+    data.result.forEach((element) => {
+      if (element.model == model) {
+        devices_info.push({
+          tuyaID: element.id,
+          online: element.online,
+          result: element.status,
+        });
+        //console.log(element);
+      }
+    });
+  } else {
+    console.log("No se ha obtenido los datos");
+  }
 };
 
 //Se obtiene datos del sensor. Obligatorio que sea el modelo de la variable model.
@@ -153,7 +162,6 @@ exports.getDeviceInfo = async (req, res, next) => {
     }
 
     const role = await getRole(user);
-    console.log("Dice lo siguiente: " + role);
 
     if (role != "") {
       if (!role == "admin" && !role == "metalurgico") {
@@ -161,6 +169,12 @@ exports.getDeviceInfo = async (req, res, next) => {
       }
     } else {
       return res.status(401).json({ error: "Acceso no autorizado" });
+    }
+
+    const verified = verifyToken(token, JWT_SECRET, user);
+
+    if (!verified) {
+      return res.status(401).json({ error: "Token invalido" });
     }
 
     let body = [];
