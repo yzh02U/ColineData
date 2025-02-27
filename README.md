@@ -48,11 +48,7 @@ Por ejemplo, la clave "123456" produce el siguiente hashing:
    8D969EEF6ECAD3C29A3A629280E686CF0C3F5D5A86AFF3CA12020C923ADC6C92
 ```
 
-Luego se almacena en la base de datos.
-
-![image](https://github.com/user-attachments/assets/149b6cc5-44a8-4ed1-8060-142fe56782a4)
-
-Puede utilizar la siguiente query para guardar su credencial en la base de datos:
+Luego se almacena en la base de datos. Puede utilizar la siguiente query para guardar su credencial en la base de datos:
 
 ```
 INSERT INTO users (usuario, contraseña, rol) VALUES
@@ -75,17 +71,23 @@ const connection = mysql.createPool({
   database: "colinedata", // Base de datos
 });
 ```
--En la ruta "ColineData/backend/Contollers/TuyaController.js" debe modificar las siguientes variables de acceso a la plataforma Tuya:
+-En la ruta "ColineData/backend/Contollers/Credentials.js" debe modificar las siguientes variables de acceso para todas las plataformas que integran este sistema:
 
  ```
-const TuyaClient_ID = "" ;
-const TuyaClient_Secret = "";
-const TuyaUID = "";
-const model = "";
+  EwelinkAPP_ID: "",
+  EwelinkAPP_Secret: "",
+  TuyaClient_ID: "",
+  TuyaClient_Secret: "",
+  TuyaUID: "",
+  model: "",
  ```
 
 - Ejecute el servidor backend con "npm start".
 
+- Al iniciar el proyecto, le imprimirá por consola una url a la que deberá autenticarse mediante sus credenciales de desarrollador. Una vez hecho, se enviarán ciertos parámetros al servidor para autenticarse y utilizar las endpoints de la API Ewelink. Se muestra una estructura similar.
+ ```
+https://c2ccdn.coolkit.cc/oauth/index.html?state=XXXX&clientId=XXXXX&seq=XXXXXX&redirectUrl=XXXXXX&nonce=XXXXXX&grantType=authorization_code&showQRCode=false
+ ```
 ## Frontend
 
 - Vaya a la carpeta frontend con "cd frontend".
