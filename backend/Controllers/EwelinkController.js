@@ -155,6 +155,11 @@ exports.updateStatusofDevice = async (req, res, next) => {
       return res.status(401).json({ error: "Token invalido" });
     }
 
+    const rol = await getRole("user");
+    if (rol != "admin" && rol != "analista" && rol != "operador") {
+      return res.status(401).json({ error: "Acceso no autorizado" });
+    }
+
     if (state != "on" && state != "off") {
       return res
         .status(400)
